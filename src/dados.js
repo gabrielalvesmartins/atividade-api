@@ -9,3 +9,18 @@ export function criarTarefa(titulo) {
   tarefas.push(nova);
   return nova;
 }
+
+export function atualizarTarefa(id, titulo, concluida) {
+  const tarefa = tarefas.find(t => t.id === id);
+  if (!tarefa) return null;
+  if (titulo !== undefined) tarefa.titulo = titulo;
+  if (concluida !== undefined) tarefa.concluida = concluida;
+  return tarefa;
+}
+
+export function deletarTarefa(id) {
+  const index = tarefas.findIndex(t => t.id === id);
+  if (index === -1) return false;
+  tarefas.splice(index, 1);
+  return true;
+}

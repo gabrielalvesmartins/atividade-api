@@ -22,10 +22,17 @@ app.post("/tarefas", (req, res) => {
 app.put("/tarefas/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const { titulo, concluida } = req.body;
+
+  if (titulo !== undefined && titulo.trim() === "") {
+    return res.status(400).json({ erro: "Título não pode ser vazio." });
+  }
+
   const tarefa = atualizarTarefa(id, titulo, concluida);
+
   if (!tarefa) {
     return res.status(404).json({ erro: "Tarefa não encontrada." });
   }
+
   res.status(200).json(tarefa);
 });
 

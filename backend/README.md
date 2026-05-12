@@ -1,238 +1,231 @@
-# AV1 - Backend (API REST + Prisma + MySQL)
+# API de Tarefas - Arquitetura MVC
 
-Sistema de gerenciamento de tarefas desenvolvido com Node.js, Express, Prisma ORM e MySQL.
+## 📚 Sobre o Projeto
 
-## 🛠️ Tecnologias
+API REST para gerenciamento de tarefas, desenvolvida com **Node.js** e **Express**, seguindo o padrão de arquitetura **MVC (Model-View-Controller)**.
 
-- **Node.js** + **Express**: Framework web
-- **Prisma ORM**: Abstração do banco de dados
-- **MySQL**: Banco de dados relacional
-- **CORS**: Suporte a requisições entre origens
-- **Dotenv**: Gerenciamento de variáveis de ambiente
+## 🏗️ Arquitetura MVC
 
-## 📋 Requisitos
+### O que é MVC?
 
-- Node.js v16+
-- MySQL 5.7+ ou MariaDB
-- npm ou yarn
+MVC é um padrão de arquitetura que separa a aplicação em três camadas principais:
 
-## 🚀 Instalação e Setup
+- **Model (Modelo)**: Gerencia os dados e a lógica de negócio
+- **View (Visão)**: Apresenta os dados ao usuário (no caso de APIs, são as respostas JSON)
+- **Controller (Controlador)**: Processa as requisições e coordena Model e View
 
-### 1. Clonar o repositório
-```bash
-git clone <seu-repositorio>
-cd av1-dsw-nome-sobrenome-2bimestre/backend
+### Benefícios
+
+- ✅ **Separação de responsabilidades**: Cada camada tem uma função específica
+- ✅ **Manutenibilidade**: Código mais fácil de entender e modificar
+- ✅ **Escalabilidade**: Facilita a adição de novos recursos
+- ✅ **Testabilidade**: Permite testar cada camada independentemente
+- ✅ **Reutilização**: Código pode ser reutilizado em diferentes contextos
+
+## 📂 Estrutura do Projeto
+
+```
+api-base-2bimestre/
+├── src/
+│   ├── models/              # Camada de Dados
+│   │   └── tarefaModel.js   # Lógica de negócio das tarefas
+│   │
+│   ├── controllers/         # Camada de Controle
+│   │   └── tarefaController.js  # Processa requisições HTTP
+│   │
+│   ├── routes/              # Definição de Rotas
+│   │   └── tarefaRoutes.js  # Rotas da API
+│   │
+│   ├── views/               # Camada de Apresentação (para futuro frontend)
+│   │   └── README.md
+│   │
+│   ├── config/              # Configurações (vazio no momento)
+│   │
+│   ├── app.js               # Configuração do Express
+│   ├── server.js            # Inicialização do servidor
+│   ├── index.js             # Arquivo de teste (opcional)
+│   └── tarefas.js           # Arquivo antigo (pode ser removido)
+│
+├── package.json
+└── README.md
 ```
 
-### 2. Instalar dependências
+## 🔄 Fluxo de uma Requisição
+
+```
+Cliente → Rota → Controller → Model → Controller → Resposta JSON (View)
+```
+
+**Exemplo prático:**
+
+1. **Cliente** faz uma requisição: `GET /tarefas`
+2. **Rota** (`tarefaRoutes.js`) identifica a rota e chama o controller
+3. **Controller** (`tarefaController.js`) recebe a requisição
+4. **Controller** chama o **Model** (`tarefaModel.js`) para buscar os dados
+5. **Model** retorna os dados para o **Controller**
+6. **Controller** envia a resposta JSON de volta ao **Cliente**
+
+## 🚀 Como Executar
+
+### Instalação
+
 ```bash
 npm install
 ```
 
-### 3. Configurar variáveis de ambiente
+### Iniciar o Servidor
 
-Copie o arquivo `.env.example` para `.env`:
-```bash
-cp .env.example .env
-```
-
-Edite o arquivo `.env` com suas credenciais do MySQL:
-```env
-DATABASE_URL="mysql://usuario:senha@localhost:3306/av1_tarefas"
-PORT=3000
-```
-
-### 4. Executar migrações do Prisma
-
-Crie o banco de dados e as tabelas:
-```bash
-npm run prisma:migrate
-```
-
-Isso criará a tabela `tarefas` conforme definido em `schema.prisma`.
-
-### 5. Iniciar o servidor
-
-Modo desenvolvimento (com hot-reload):
 ```bash
 npm run dev
 ```
 
-Modo produção:
-```bash
-npm start
+O servidor estará rodando em: `http://localhost:3000`
+
+## 📡 Endpoints da API
+
+### Listar todas as tarefas
+
+```http
+GET /tarefas
 ```
 
-O servidor estará rodando em `http://localhost:3000`.
+### Obter uma tarefa específica
 
-## 📡 API REST - Endpoints
-
-### GET `/api/tarefas`
-Retorna lista de todas as tarefas.
-
-**Resposta (200)**:
-```json
-[
-  {
-    "id": 1,
-    "titulo": "Estudar Node",
-    "concluida": false,
-    "createdAt": "2024-05-05T10:30:00Z",
-    "updatedAt": "2024-05-05T10:30:00Z"
-  }
-]
+```http
+GET /tarefas/:id
 ```
 
----
+### Criar uma nova tarefa
 
-### POST `/api/tarefas`
-Cria uma nova tarefa.
+```http
+POST /tarefas
+Content-Type: application/json
 
-**Body (JSON)**:
-```json
 {
-  "titulo": "Minha nova tarefa"
+  "descricao": "Minha nova tarefa"
 }
 ```
 
-**Resposta (201)**:
-```json
+### Atualizar uma tarefa
+
+```http
+PATCH /tarefas/:id
+Content-Type: application/json
+
 {
-  "id": 2,
-  "titulo": "Minha nova tarefa",
-  "concluida": false,
-  "createdAt": "2024-05-05T10:35:00Z",
-  "updatedAt": "2024-05-05T10:35:00Z"
-}
-```
-
-**Erro (400)** - Título vazio ou não fornecido:
-```json
-{
-  "erro": "Título é obrigatório."
-}
-```
-
----
-
-### PUT `/api/tarefas/:id`
-Atualiza uma tarefa existente.
-
-**Body (JSON)**:
-```json
-{
-  "titulo": "Tarefa atualizada",
+  "descricao": "Tarefa atualizada",
   "concluida": true
 }
 ```
 
-**Resposta (200)**:
+### Excluir uma tarefa
+
+```http
+DELETE /tarefas/:id
+```
+
+## 🎯 Detalhes das Camadas
+
+### 📊 Model (`models/tarefaModel.js`)
+
+Responsável por:
+
+- Armazenar dados (em memória, por enquanto)
+- Implementar lógica de negócio
+- Operações CRUD (Create, Read, Update, Delete)
+
+**Funções principais:**
+
+- `obterTodasTarefas()`
+- `obterTarefaPorId(id)`
+- `criarNovaTarefa(descricao)`
+- `atualizarTarefa(id, descricao, status)`
+- `excluirTarefa(id)`
+
+### 🎮 Controller (`controllers/tarefaController.js`)
+
+Responsável por:
+
+- Receber requisições HTTP
+- Validar dados de entrada
+- Chamar métodos do Model
+- Retornar respostas HTTP apropriadas
+
+**Funções principais:**
+
+- `listarTarefas(req, res)`
+- `obterTarefa(req, res)`
+- `criarTarefa(req, res)`
+- `atualizarTarefa(req, res)`
+- `excluirTarefa(req, res)`
+
+### 🛣️ Routes (`routes/tarefaRoutes.js`)
+
+Responsável por:
+
+- Definir as rotas da API
+- Mapear URLs para controllers
+- Organizar endpoints por recurso
+
+### ⚙️ App (`app.js`)
+
+Responsável por:
+
+- Configurar middlewares
+- Registrar rotas
+- Configurar tratamento de erros
+- Exportar a aplicação configurada
+
+### 🖥️ Server (`server.js`)
+
+Responsável por:
+
+- Importar a aplicação
+- Iniciar o servidor na porta especificada
+- Separar lógica de configuração da inicialização
+
+## 🔮 Próximos Passos
+
+- [ ] Integrar banco de dados (MongoDB, PostgreSQL, etc.)
+- [ ] Adicionar autenticação e autorização
+- [ ] Implementar validação com bibliotecas (Joi, Yup)
+- [ ] Criar testes unitários e de integração
+- [ ] Adicionar frontend (React, Vue, etc.)
+- [ ] Implementar tratamento de erros centralizado
+- [ ] Adicionar paginação nas listagens
+- [ ] Documentar API com Swagger
+
+## 🛠️ Tecnologias
+
+- **Node.js**: Ambiente de execução JavaScript
+- **Express**: Framework web minimalista
+- **ES Modules**: Uso de `import/export` ao invés de `require`
+
+## 📝 Scripts Disponíveis
+
 ```json
 {
-  "id": 1,
-  "titulo": "Tarefa atualizada",
-  "concluida": true,
-  "createdAt": "2024-05-05T10:30:00Z",
-  "updatedAt": "2024-05-05T10:40:00Z"
+  "dev": "np src/server.js", // Inicia o servidor em modo desenvolvimento
+  "batata": "node src/index.js" // Executa o arquivo de teste
 }
 ```
 
-**Erro (404)** - Tarefa não encontrada:
-```json
-{
-  "erro": "Tarefa não encontrada."
-}
-```
+## ⚠️ Observações
+
+- Os dados estão armazenados **em memória** e serão perdidos quando o servidor reiniciar
+- Para persistência de dados, será necessário integrar um banco de dados
+- O diretório `views/` está preparado para receber o frontend no futuro
+
+## 📖 Aprendizado
+
+Este projeto é ideal para entender:
+
+- ✅ Como estruturar uma API REST
+- ✅ O que é e como aplicar o padrão MVC
+- ✅ Separação de responsabilidades
+- ✅ Boas práticas de organização de código
+- ✅ Como preparar um projeto para crescer
 
 ---
 
-### DELETE `/api/tarefas/:id`
-Deleta uma tarefa.
-
-**Resposta (204)**: Sem corpo
-
-**Erro (404)** - Tarefa não encontrada:
-```json
-{
-  "erro": "Tarefa não encontrada."
-}
-```
-
----
-
-### GET `/health`
-Health check da API.
-
-**Resposta (200)**:
-```json
-{
-  "status": "OK",
-  "message": "API rodando"
-}
-```
-
-## 📁 Estrutura do Projeto
-
-```
-backend/
-├── src/
-│   ├── controllers/
-│   │   └── TarefaController.js      # Lógica de negócio das tarefas
-│   ├── routes/
-│   │   └── tarefas.js               # Rotas da API
-│   └── app.js                       # Configuração do Express
-├── prisma/
-│   └── schema.prisma                # Definição do modelo de dados
-├── package.json
-├── .env.example
-└── README.md
-```
-
-## 🧪 Testando a API
-
-### Com cURL
-
-```bash
-# GET - Listar tarefas
-curl http://localhost:3000/api/tarefas
-
-# POST - Criar tarefa
-curl -X POST http://localhost:3000/api/tarefas \
-  -H "Content-Type: application/json" \
-  -d '{"titulo":"Nova tarefa"}'
-
-# PUT - Atualizar tarefa (id = 1)
-curl -X PUT http://localhost:3000/api/tarefas/1 \
-  -H "Content-Type: application/json" \
-  -d '{"titulo":"Tarefa atualizada","concluida":true}'
-
-# DELETE - Deletar tarefa (id = 1)
-curl -X DELETE http://localhost:3000/api/tarefas/1
-```
-
-### Com Postman ou Insomnia
-
-1. Importe as requisições ou crie manualmente os endpoints acima
-2. Teste cada operação CRUD
-3. Valide as respostas e códigos de status
-
-## 🔧 Prisma Studio
-
-Para visualizar e gerenciar os dados do banco via interface web:
-
-```bash
-npm run prisma:studio
-```
-
-Acesse `http://localhost:5555`
-
-## 📝 Observações
-
-- O campo `createdAt` é preenchido automaticamente com a data/hora de criação
-- O campo `updatedAt` é atualizado automaticamente quando o registro é modificado
-- A API retorna os dados ordenados pela data de criação (mais recentes primeiro)
-- Validação de título vazio está implementada em ambas operações (POST e PUT)
-
-## 📧 Autor
-
-Projeto desenvolvido para AV1 - Desenvolvimento de Sistemas Web
+Desenvolvido para fins educacionais 🎓

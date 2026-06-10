@@ -1,23 +1,296 @@
-# API de Tarefas - Arquitetura MVC
+# Backend - API de Gerenciamento de Tarefas
 
-## 📚 Sobre o Projeto
+## 📋 Sobre o Projeto
 
-API REST para gerenciamento de tarefas, desenvolvida com **Node.js** e **Express**, seguindo o padrão de arquitetura **MVC (Model-View-Controller)**.
+API REST para gerenciamento de tarefas, desenvolvida com:
+- **Node.js** + **Express**
+- **Prisma ORM**
+- **MySQL**
+- Padrão de arquitetura **MVC**
 
-## 🏗️ Arquitetura MVC
+## 🏗️ Estrutura de Diretórios
 
-### O que é MVC?
+```
+backend/
+├── src/
+│   ├── controllers/      # Lógica das requisições
+│   ├── models/          # Lógica de dados (Prisma)
+│   ├── routes/          # Definição de rotas
+│   ├── config/          # Configurações (banco de dados)
+│   ├── app.js           # Configuração do Express
+│   └── server.js        # Inicialização do servidor
+├── prisma/
+│   └── schema.prisma    # Schema do banco de dados
+├── package.json         # Dependências
+├── .env.example         # Exemplo de variáveis de ambiente
+└── README.md            # Este arquivo
+```
 
-MVC é um padrão de arquitetura que separa a aplicação em três camadas principais:
+## 🚀 Como Executar
 
-- **Model (Modelo)**: Gerencia os dados e a lógica de negócio
-- **View (Visão)**: Apresenta os dados ao usuário (no caso de APIs, são as respostas JSON)
-- **Controller (Controlador)**: Processa as requisições e coordena Model e View
+### 1. Instalar dependências
 
-### Benefícios
+```bash
+npm install
+```
 
-- ✅ **Separação de responsabilidades**: Cada camada tem uma função específica
-- ✅ **Manutenibilidade**: Código mais fácil de entender e modificar
+### 2. Configurar variáveis de ambiente
+
+Copie o arquivo `.env.example` e crie um `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` com suas configurações:
+
+```env
+DATABASE_URL="mysql://seu_usuario:sua_senha@localhost:3306/tarefas_db"
+PORT=3000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+```
+
+### 3. Configurar banco de dados
+
+Execute as migrações do Prisma para criar as tabelas:
+
+```bash
+npm run prisma:migrate
+```
+
+Ou sincronize o schema:
+
+```bash
+npm run prisma:push
+```
+
+### 4. Iniciar o servidor
+
+Modo desenvolvimento (com auto-reload):
+
+```bash
+npm run dev
+```
+
+Modo produção:
+
+```bash
+npm start
+```
+
+O servidor estará rodando em: `http://localhost:3000`
+
+## 📡 Endpoints da API
+
+### Base URL
+```
+http://localhost:3000
+```
+
+### Health Check
+```
+GET /health
+```
+Retorna o status da API.
+
+### Tarefas
+
+#### Listar todas as tarefas
+```
+GET /tasks
+```
+**Resposta (200):**
+```json
+[
+  {
+    "id": 1,
+    "title": "Minha tarefa",
+    "description": "Descrição da tarefa",
+    "completed": false,
+    "createdAt": "2024-05-08T10:30:00.000Z"
+  }
+]
+```
+
+#### Buscar tarefa por ID
+```
+GET /tasks/:id
+```
+**Parâmetro:**
+- `id` (número): ID da tarefa
+
+**Resposta (200):**
+```json
+{
+  "id": 1,
+  "title": "Minha tarefa",
+  "description": "Descrição da tarefa",
+  "completed": false,
+  "createdAt": "2024-05-08T10:30:00.000Z"
+}
+```
+
+#### Criar nova tarefa
+```
+POST /tasks
+```
+**Body (JSON):**
+```json
+{
+  "title": "Nova tarefa",
+  "description": "Descrição opcional",
+  "completed": false
+}
+```
+**Resposta (201):**
+```json
+{
+  "id": 2,
+  "title": "Nova tarefa",
+  "description": "Descrição opcional",
+  "completed": false,
+  "createdAt": "2024-05-09T14:20:00.000Z"
+}
+```
+
+#### Atualizar tarefa
+```
+PUT /tasks/:id
+```
+**Parâmetro:**
+- `id` (número): ID da tarefa
+
+**Body (JSON):**
+```json
+{
+  "title": "Tarefa atualizada",
+  "description": "Nova descrição",
+  "completed": true
+}
+```
+**Resposta (200):**
+```json
+{
+  "id": 1,
+  "title": "Tarefa atualizada",
+  "description": "Nova descrição",
+  "completed": true,
+  "createdAt": "2024-05-08T10:30:00.000Z"
+}
+```
+
+#### Deletar tarefa
+```
+DELETE /tasks/:id
+```
+**Parâmetro:**
+- `id` (número): ID da tarefa
+
+**Resposta (200):**
+```json
+{
+  "message": "Tarefa deletada com sucesso",
+  "id": 1
+}
+```
+
+## 🧪 Testando com Postman ou Insomnia
+
+1. Importe a coleção (se disponível) ou crie manualmente as requisições
+2. Configure a variável de ambiente `{{base_url}}` como `http://localhost:3000`
+3. Teste cada endpoint
+
+## 📁 Configuração do Banco de Dados
+
+### Schema Prisma
+
+O arquivo `prisma/schema.prisma` define o modelo de dados:
+
+```prisma
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+```
+
+### Alterar Schema
+
+1. Edite `prisma/schema.prisma`
+2. Execute: `npm run prisma:migrate dev`
+3. Nomeie a migração
+4. Pronto! O schema foi atualizado
+
+## 🔧 Scripts Disponíveis
+
+```bash
+# Iniciar em modo desenvolvimento
+npm run dev
+
+# Iniciar em modo produção
+npm start
+
+# Abrir Prisma Studio (GUI para banco de dados)
+npm run prisma:studio
+
+# Executar migrações
+npm run prisma:migrate
+
+# Sincronizar schema
+npm run prisma:push
+```
+
+## 📝 Padrão MVC
+
+### Models (models/)
+- Lógica de manipulação de dados via Prisma
+- Consultas ao banco de dados
+- Validações de dados
+
+### Controllers (controllers/)
+- Processam requisições HTTP
+- Chamam os models
+- Retornam respostas formatadas
+
+### Routes (routes/)
+- Definem os endpoints
+- Mapeiam requisições para controllers
+- Validações básicas
+
+## ⚙️ Middleware Configurados
+
+- **CORS**: Permite requisições do frontend
+- **express.json()**: Processa JSON
+- **express.urlencoded()**: Processa dados de formulários
+
+## 🐛 Tratamento de Erros
+
+Todos os endpoints retornam erros padronizados:
+
+```json
+{
+  "erro": "Descrição do erro",
+  "detalhes": "Informações adicionais (em desenvolvimento)"
+}
+```
+
+## 📚 Dependências Principais
+
+- **express**: Framework web
+- **prisma**: ORM para banco de dados
+- **@prisma/client**: Cliente Prisma
+- **dotenv**: Variáveis de ambiente
+- **mysql2**: Driver MySQL
+- **nodemon**: Auto-reload em desenvolvimento
+
+## 🔗 Links Úteis
+
+- [Documentação Express](https://expressjs.com/)
+- [Documentação Prisma](https://www.prisma.io/docs/)
+- [Documentação MySQL](https://dev.mysql.com/doc/)
 - ✅ **Escalabilidade**: Facilita a adição de novos recursos
 - ✅ **Testabilidade**: Permite testar cada camada independentemente
 - ✅ **Reutilização**: Código pode ser reutilizado em diferentes contextos

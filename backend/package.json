@@ -1,35 +1,29 @@
 {
-  "name": "js-basico",
+  "name": "api-tarefas",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "batata": "node src/index.js",
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:push": "prisma db push",
+    "prisma:generate": "prisma generate"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/h-fcosta/js-basico.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/h-fcosta/js-basico/issues"
-  },
-  "homepage": "https://github.com/h-fcosta/js-basico#readme",
-  "description": "",
+  "keywords": ["api", "express", "prisma", "mysql", "rest"],
+  "author": "Seu Nome",
+  "license": "MIT",
+  "description": "API REST de gerenciamento de tarefas com Express e Prisma",
   "dependencies": {
-    "@prisma/client": "5.22.0",
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.7.0",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mariadb": "^3.5.2",
+    "express": "^4.18.2",
     "mysql2": "^3.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
-    "prisma": "5.22.0"
+    "prisma": "^7.7.0"
   }
 }

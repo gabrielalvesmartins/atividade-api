@@ -1,30 +1,25 @@
 import express from "express";
+import cors from "cors";
 import tarefaRoutes from "./routes/tarefaRoutes.js";
 
 const app = express();
 
-// Middleware CORS
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ];
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5173',
+];
 
-  if (allowedOrigins.includes(req.headers.origin)) {
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-  }
-
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('CORS policy: origin not allowed'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
